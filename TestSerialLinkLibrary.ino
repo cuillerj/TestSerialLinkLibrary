@@ -25,7 +25,7 @@ int retryCount = 0;            // number of retry for sending
 unsigned long timeSendSecSerial;  // used to check for acknowledgment of secured frames
 unsigned long timeReceiveSerial;  // used to regularly check for received message
 unsigned long timeSendInfo;     // to regurarly send information to th server
-unsigned long durationSincegatewayReady;  //  duration since GPIO ready goes on 
+unsigned long durationSincegatewayReady;  //  duration since GPIO ready goes on
 uint8_t gatewayStatus = 0x00;    // 0x00 not ready  0x01 ready GPIO on wait boot completed 0x02 ready
 #define delayBetweenInfo 5000   // delay before sending new data to the server  
 uint8_t sendInfoSwitch = 0x00;  // flag to switch between different data to send
@@ -87,14 +87,22 @@ void loop() {
 #if defined(debugConnection)
         Serial.println("frame 1 to be sent");
 #endif
-        Send1();                 // send robot status to the server
+        Send1();                 //
       }
       if (sendInfoSwitch % 2 == 1)
       {
 #if defined(debugConnection)
         Serial.println("frame 2 to be sent");
 #endif
-        Send2();             // send power info to the server
+        Send2();             // 
+        count++;
+      }
+      if (sendInfoSwitch % 10 == 1)
+      {
+#if defined(debugConnection)
+        Serial.println("frame 3 to be sent");
+#endif
+        Send3();             // 
         count++;
       }
       sendInfoSwitch = sendInfoSwitch + 1;
@@ -182,4 +190,14 @@ void Send2()
   GatewayLink.PendingDataReqSerial[29] = 0xff;
   GatewayLink.PendingDataLenSerial = 0x1e; // 6 longueur mini max 30 pour la gateway
 }
-
+void Send3()
+{
+  GatewayLink.PendingReqSerial = 0x0f;         // this byte is used by SerialLink code
+  GatewayLink.PendingDataReqSerial[0] = 0x53; //       flag for server traitment
+  GatewayLink.PendingDataReqSerial[1] = 0x53;//
+  GatewayLink.PendingDataReqSerial[2] = 0x49;
+  GatewayLink.PendingDataReqSerial[3] = 0x44;
+  GatewayLink.PendingDataReqSerial[4] = 0x3d;
+  GatewayLink.PendingDataReqSerial[5] = 0x32;
+  GatewayLink.PendingDataLenSerial = 0x06; // 6 longueur mini max 30 pour la gateway
+}

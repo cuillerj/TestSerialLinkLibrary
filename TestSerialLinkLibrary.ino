@@ -25,6 +25,8 @@ int retryCount = 0;            // number of retry for sending
 unsigned long timeSendSecSerial;  // used to check for acknowledgment of secured frames
 unsigned long timeReceiveSerial;  // used to regularly check for received message
 unsigned long timeSendInfo;     // to regurarly send information to th server
+unsigned long durationSincegatewayReady;  //  duration since GPIO ready goes on 
+uint8_t gatewayStatus = 0x00;    // 0x00 not ready  0x01 ready GPIO on wait boot completed 0x02 ready
 #define delayBetweenInfo 5000   // delay before sending new data to the server  
 uint8_t sendInfoSwitch = 0x00;  // flag to switch between different data to send
 unsigned int count = 0;
@@ -61,7 +63,7 @@ void setup() {
 
 void loop() {
 
-  if (digitalRead(readyPin) == 1) {
+  if (digitalRead(readyPin) == 1 && gatewayStatus == 0x02) {
     // ***  keep in touch with the server
     int getSerial = GatewayLink.Serial_have_message();  // check if we have received a message
     if (getSerial > 0)                                  // we got a message
@@ -102,6 +104,19 @@ void loop() {
   else {
     Serial.println("wait for esp8226 to be ready");
     delay(2000);
+    if (digitalRead(readyPin) == 0)
+    {
+      gatewayStatus = 0x00;
+    }
+    if (digitalRead(readyPin) == 1 && gatewayStatus == 0x00)
+    {
+      gatewayStatus = 0x01;
+      durationSincegatewayReady = millis();
+    }
+    if (millis() - durationSincegatewayReady > 15000 && gatewayStatus == 0x01)
+    {
+      gatewayStatus = 0x02;
+    }
   }
 }
 void TraitInput(uint8_t cmdInput) {

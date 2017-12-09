@@ -1,6 +1,6 @@
 /*
     this a arduino code that works with the jaba ESP8266SerialUdpGatewayExample using a ESP8266 as a serial IP gateway
-    It has been tested with aruino UNO and arduino Mega
+    It has been tested with arduino UNO and arduino Mega
     It is easiest to test with a Mega that have more than one UART
     When using arduino UNO USB connexion is no longer available so debuging is much more difficult
     It sends alternativly 2 different frames
